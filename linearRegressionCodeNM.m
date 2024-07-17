@@ -1,6 +1,6 @@
 % linear regression for logD vs 1/T fits, plots
 
-addpath('../McLeanLinearRegression')
+%addpath('../McLeanLinearRegression')
 
 % Run Yuanyuan's code:
 importDataFromSpreadsheet;
@@ -110,7 +110,7 @@ plot(1./Tvec, av_DU(1) + av_DU(2)./Tvec, '-', ...
 residualVariance = var(log(DU(:,1)) - (av_DU(1)+av_DU(2)./T(:,1)));
 
 for iT = 1:nT
-    logDU_fits2 = [1 1/Tvec(iT,1)]*S_DU*[1; 1/Tvec(iT,1)];
+    logDU_fits2(iT) = [1 1/Tvec(iT,1)]*S_DU*[1; 1/Tvec(iT,1)];
 end
 
 logDU_fit1s = sqrt(logDU_fits2 + residualVariance);
@@ -121,7 +121,7 @@ plot(1./Tvec, av_DU(1) + av_DU(2)./Tvec - ...
 plot(1./Tvec, av_DU(1) + av_DU(2)./Tvec + ...
      envelopeSigmaLevel*logDU_fit1s, ...
      'Color', envelopeColor, 'LineWidth', envelopeLineWidth)
-
+  
 xlim([min(1./Tvec), max(1./Tvec)])
 set(gca, 'FontSize', figureFontSize)
 xlabel("1/T  (K^{-1})", 'FontSize', axisLabelFontSize)
@@ -190,7 +190,7 @@ plot(1./Tvec, av_DTh(1) + av_DTh(2)./Tvec, '-', ...
 residualVariance = var(log(DTh(:,1)) - (av_DTh(1)+av_DTh(2)./T(:,1)));
 
 for iT = 1:nT
-    logDTh_fits2 = [1 1/Tvec(iT,1)]*S_DTh*[1; 1/Tvec(iT,1)];
+    logDTh_fits2(iT) = [1 1/Tvec(iT,1)]*S_DTh*[1; 1/Tvec(iT,1)];
 end
 
 logDTh_fit1s = sqrt(logDTh_fits2 + residualVariance);
@@ -274,7 +274,7 @@ vardiff = max(resid.^2 - DThDU(:,2).^2, 0);
 residualVariance = mean(vardiff); % pretty rough estimate
 
 for iT = 1:nT
-    logDThDU_fits2 = [1 1/Tvec(iT,1)]*S_DThDU*[1; 1/Tvec(iT,1)];
+    logDThDU_fits2(iT) = [1 1/Tvec(iT,1)]*S_DThDU*[1; 1/Tvec(iT,1)];
 end
 
 logDThDU_fit1s = sqrt(logDThDU_fits2 + residualVariance);
