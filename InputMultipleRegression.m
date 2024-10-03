@@ -40,11 +40,24 @@ DTh(21:66,2) = DThMC_std(21:66,1);
 DTh(:,3) = log(DTh(:,1)+DTh(:,2)) - log(DTh(:,1)); %legth for DTh error bar pos side
 DTh(:,4) = log(DTh(:,1)) - log(DTh(:,1)-DTh(:,2)); %legth for DTh error bar neg side
 
+% use zircon-specific DThDU data from Supplmentary Data for experiments
 DThDU = zeros(height(DvsTSiO2source),4);
-DThDU(1:20,1) = DvsTSiO2source{1:20,5} ./ DvsTSiO2source{1:20,3};
+for iExp = 1:20
+
+    logDThDU = log(expZircDs(iExp).DThDU);
+    logDThDU = rmoutliers(logDThDU, 'median');
+    DThDU(iExp,1) = exp(mean(logDThDU)); % geometric mean
+    DThDU(iExp,2) = std(logDThDU)*exp(mean(logDThDU)) / sqrt(length(logDThDU)); % stdev
+
+end
+
+%DThDU(1:20,1) = DvsTSiO2source{1:20,5} ./ DvsTSiO2source{1:20,3};
+%DThDU(1:20,2) = sqrt((1./DU(1:20,1).^2).*DTh(1:20,2).^2 + ...
+%                  (DTh(1:20,1).^2./DU(1:20,1).^4).*DU(1:20,2).^2);
+
 DThDU(21:66,1) = DThDUMC_mean(21:66,1);
-DThDU(1:20,2) = sqrt((1./DU(1:20,1).^2).*DTh(1:20,2).^2 + ...
-                  (DTh(1:20,1).^2./DU(1:20,1).^4).*DU(1:20,2).^2);
 DThDU(21:66,2) = DThDUMC_std(21:66,1);
-DThDU(:,3) = log(DThDU(:,1)+DThDU(:,2)) - log(DThDU(:,1)); %legth for DTh/DU error bar pos side
-DThDU(:,4) = log(DThDU(:,1)) - log(DThDU(:,1)-DThDU(:,2)); %legth for DTh/DU error bar neg side
+%DThDU(:,3) = log(DThDU(:,1)+DThDU(:,2)) - log(DThDU(:,1)); %legth for DTh/DU error bar pos side
+%DThDU(:,4) = log(DThDU(:,1)) - log(DThDU(:,1)-DThDU(:,2)); %legth for DTh/DU error bar neg side
+
+clear logDThDU

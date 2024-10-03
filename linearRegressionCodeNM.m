@@ -12,7 +12,7 @@ InputMultipleRegression;
 % Results in DTh, DU, and DThDU. Column 1 value, col 2 is 1s abs
 
 % remove outliers, per WUSTL
-remSamples = 54:55;
+remSamples = [5 54:55];
 T(remSamples,:) = [];
 DU(remSamples,:) = [];
 DTh(remSamples,:) = [];
@@ -22,7 +22,7 @@ DThDU(remSamples,:) = [];
 
 %% set plot properties here
 
-ourExperiments = 1:20;
+ourExperiments = 1:19; %1:20;
 ourExperimentsColor = 'k';
 otherExperiments = 21:35;
 otherExperimentsColor = 'b';
@@ -447,3 +447,38 @@ annDThDU.EdgeColor = "none";
 % 
 % xlabel('T (C)', 'FontSize', 16)
 % ylabel('DTh/DU', 'FontSize', 16)
+
+%%
+
+%plotZirconDThDU(T, expZircDs)
+
+function plotZirconDThDU(T, expZircDs)
+
+nExp = 20; % n experiments
+
+T = T(1:nExp,1);
+
+DUAll = [];
+DThAll = [];
+TempAll = [];
+
+figure()
+set(gca, "FontSize", 24)
+xlabel("DU")
+ylabel("DTh")
+hold on
+
+for iExp = 1:nExp
+
+    DUAll = [DUAll; expZircDs(iExp).DU];
+    DThAll = [DThAll; expZircDs(iExp).DTh];
+    TempAll = [TempAll; T(iExp)*ones(size(expZircDs(iExp).DU))];
+
+end % for iExp
+
+DThDUAll = log(DThAll./DUAll);
+
+scatter(log(DUAll), DThAll, 100, TempAll, 'Marker','.')
+%xlim([0 10])
+
+end % function plotZirconDThDU
