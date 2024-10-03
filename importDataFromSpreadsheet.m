@@ -325,7 +325,62 @@ S.TSiO2DU = blkdiag(S.T, S.SiO2, S.DU);
 
 
 
-%% clean up
+%% clean up first import
 
 clear a b c catnrm catpct catpctSum catpctVec dM dT iSample Mi mm nSamples Zr s molpctVec molpctzir molpctSumVec molpctzirVec DU DTh DThDU
 %molpctSum molregls molreZir data
+
+
+%% Import individual zircon DU and DTh values
+% from SupplementaryMaterial_AtomPercent.xlsx
+
+fileName = "SupplementaryMaterial_AtomPercent.xlsx";
+opts = spreadsheetImportOptions('NumVariables', 2);
+opts = setvartype(opts, 'double');
+
+dataRanges = [
+    "H102", "AF2:AG17";
+    "J085", "AE2:AF20";
+    "H099", "AI2:AJ26";
+    "J088", "AB2:AC17";
+    "H109", "AF2:AG6";
+    "J089", "AD2:AE19";
+    "H110", "AH2:AI37";
+    "J095", "AB2:AC9";
+    "J096", "AH2:AI16";
+    "J097", "AF2:AG43"; % bimodal?
+    "J098", "AJ2:AK24";
+    "J100", "AL2:AM48";
+    "H123", "AF2:AG27";
+    "H173", "AS20:AT38";
+    "J148", "AS17:AT28";
+    "J152", "AS15:AT23";
+    "J151", "AS17:AT29";
+    "H175", "AS22:AT27";
+    "H178", "AS22:AT41";
+    "J153", "AS27:AT53"
+    ];
+
+nExperiments = length(dataRanges);
+
+for iExp = 1:nExperiments
+
+    opts.Sheet = dataRanges(iExp,1);
+    opts.DataRange = dataRanges(iExp,2);
+
+    data = readmatrix(fileName, opts);
+    
+    if any(any(isnan(data)))
+        disp("NaN in " + dataRanges(iExp,1))
+    end
+    
+    expZircDs(iExp).DU = data(:,1);
+    expZircDs(iExp).DTh = data(:,2);
+    expZircDs(iExp).DThDU = data(:,2) ./ data(:,1);
+    
+
+end % for iExp, loop through experiments and extract zircon DU & DTh
+
+
+%% clean up
+clear data opts dataRanges fileName
