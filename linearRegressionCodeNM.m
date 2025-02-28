@@ -12,7 +12,7 @@ InputMultipleRegression;
 % Results in DTh, DU, and DThDU. Column 1 value, col 2 is 1s abs
 
 % remove outliers, per WUSTL
-remSamples = [5 54:55];
+remSamples = [54:55];
 T(remSamples,:) = [];
 DU(remSamples,:) = [];
 DTh(remSamples,:) = [];
@@ -22,7 +22,7 @@ DThDU(remSamples,:) = [];
 
 %% set plot properties here
 
-ourExperiments = 1:19; %1:20;
+ourExperiments = 1:20;
 ourExperimentsColor = 'k';
 otherExperiments = 21:35;
 otherExperimentsColor = 'b';
@@ -227,6 +227,7 @@ dataunct(:,3) = log(DThDU(:,1));
 dataunct(:,4) = DThDU(:,2)./DThDU(:,1);
 
 skipv = ones(nSamples,1);
+skipv([1 5 20]) = 0;
 a1 = 0; v1 = 1; abspct = 1;
 
 McLeanLinearRegression;
@@ -300,7 +301,7 @@ annDThDU.FontSize = figureFontSize;
 annDThDU.EdgeColor = "none";
 
 
-%% now convert to DUDTh vs T
+%% now convert to DTh/DU vs T
 
 
 T1s = T(:,2)./(1./T(:,1)).*T(:,1);
@@ -450,11 +451,12 @@ annDThDU.EdgeColor = "none";
 
 %%
 
-%plotZirconDThDU(T, expZircDs)
+plotZirconDThDU(T, expZircDs)
 
 function plotZirconDThDU(T, expZircDs)
 
 nExp = 20; % n experiments
+cmp = lines(nExp);
 
 T = T(1:nExp,1);
 
@@ -470,15 +472,22 @@ hold on
 
 for iExp = 1:nExp
 
+    DU = expZircDs(iExp).DU;
+    DTh = expZircDs(iExp).DTh;
+    logDThDU = log(DTh./DU);
+    %histogram(logDThDU, 'FaceColor', cmp(iExp,:))
+
     DUAll = [DUAll; expZircDs(iExp).DU];
-    DThAll = [DThAll; expZircDs(iExp).DTh];
+    DThAll = [DThAll; expZircDs(iExp).DTh];    
     TempAll = [TempAll; T(iExp)*ones(size(expZircDs(iExp).DU))];
+    
 
 end % for iExp
 
 DThDUAll = log(DThAll./DUAll);
 
-scatter(log(DUAll), DThAll, 100, TempAll, 'Marker','.')
+histogram(DThDUAll)
+%scatter(log(DUAll), DThAll, 100, TempAll, 'Marker','.')
 %xlim([0 10])
 
 end % function plotZirconDThDU

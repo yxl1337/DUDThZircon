@@ -131,8 +131,10 @@ L = 0;
 for i = 1:n
     xi = data(i,:)' - a;  % pi - a, used often
     si = covmats(:,:,i);
-    L = L + xi'*(si\xi) - (v'*(si\xi))^2/(v'*(si\v));
+    Li(i) =  xi'*(si\xi) - (v'*(si\xi))^2/(v'*(si\v));
+    L = L + Li(i);
 end %for i = 1:n
+disp(Li)
 
 % Leaving out log(det(si)) and constant terms,
 L = -0.5*L;
