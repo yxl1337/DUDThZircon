@@ -52,6 +52,14 @@ dataCov_od = dataCovMat + od*eye(nUdata_ROI);
 [x, stdx, mse, S] = lscov(designMatrix, logDU, dataCov_od);
 logDU_1sAbs_od = sqrt(diag(dataCov_od));
 
+% re-import out-of-range DU measurements for plotting
+DU_all = dataTable.DUMCWGlsStdErr;
+DU_1sAbs_all = dataTable.DUErrprWGlsStdErr;
+logDU_highfO2 = log(DU_all(hasAllUData & ~infO2Bounds & inDUBounds));
+logDU_1sAbs_highfO2 = DU_1sAbs_all(hasAllUData & ~infO2Bounds & inDUBounds)...
+                   ./ exp(logDU_highfO2);
+fO2_highfO2 = fO2(hasAllUData & ~infO2Bounds & inDUBounds);
+
 
 %% plot U results
 
@@ -80,13 +88,20 @@ plot(xvector, yvector + 2*uncty, '-', "Color", rgb('Pine'), "LineWidth", 1.5)
 plot(xvector, yvector - 2*uncty, '-', "Color", rgb('Pine'), "LineWidth", 1.5)
 
 set(gca, "FontSize", 18)
-xlabel("fO2", "FontSize", 24)
+xlabel("log(fO2)", "FontSize", 24)
 ylabel("log(DU)", "FontSize", 24)
 
 currentXLim = xlim(gca);
 newXLim(1) = max([fO2_lowerBound, currentXLim(1), xlimits(1)]);
 newXLim(2) = min([fO2_upperBound, currentXLim(2), xlimits(2)]);
 xlim(newXLim)
+
+% % uncomment if plotting high-fO2 points
+% plot(fO2_highfO2, logDU_highfO2, '.b', 'MarkerSize', 15)
+% line([fO2_highfO2'; fO2_highfO2'], ...
+%     [logDU_highfO2' - 2*logDU_1sAbs_highfO2'; logDU_highfO2' + 2*logDU_1sAbs_highfO2'], ...
+%     'Color', rgb('black'), 'LineWidth', 2)
+% xlim([newXLim(1) 0])
 
 annotation("textbox", [0.4 0.12 0.5, 0.1], ...
     "String", "Slope = " + round(x(1),2) + " ± " + round(2*stdx(1),2), ...
