@@ -47,7 +47,7 @@ for iExp = 1:20
     logDThDU = log(expZircDs(iExp).DThDU);
     logDThDU = rmoutliers(logDThDU, 'median');
     DThDU(iExp,1) = exp(mean(logDThDU)); % geometric mean
-    DThDU(iExp,2) = std(logDThDU)*exp(mean(logDThDU)) / sqrt(length(logDThDU)); % stdev
+    DThDU(iExp,2) = std(logDThDU)*exp(mean(logDThDU));% / sqrt(length(logDThDU)); % stdev
 
 end
 
