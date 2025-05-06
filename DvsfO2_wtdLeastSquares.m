@@ -1,17 +1,39 @@
 %% Weighted least squares regression of DU, DTh vs. fO2
 
 % import data from Excel file
-filepath = "Source_DvsfO2_Feb2025.xlsx";
+filepath = "Source_DvsfO2_May2025.xlsx";
 warning('OFF', 'MATLAB:table:ModifiedAndSavedVarnames');
 dataTable = readtable(filepath);
 
-fO2_upperBound = -6;
-fO2_lowerBound = -Inf;
+% pick one, comment the other
+output = "deltaQFM";
+%output = "logfO2";
+
+% set dataset and its regression bounds
+if output == "logfO2"
+    fO2_upperBound = -6;
+    fO2_lowerBound = -15;
+    fO2 = dataTable.logfO2;
+elseif output == "deltaQFM"
+    fO2_upperBound = 5;
+    fO2_lowerBound = -Inf;
+    fO2 = dataTable.deltaQFM;
+else, disp("unknown output format")
+end
 
 DU_lowerBound = -Inf;
 DU_upperBound = Inf;
 
-fO2 = dataTable.fO2;
+% data sources and correpsonding rows in dataTable
+sourceLabels = ["this study, EPMA"; 
+    "Burnham and Berry (2012), SIMS"; 
+    "Luo and Ayers (2009), LA-ICPMS"; 
+    "Rubatto and Hermann (2007), LA-ICPMS"; 
+    "Ayers and Peters (2018), LA-ICPMS"];
+sourceRows = {1:20; 21:34; 35:46; 47:52; 53:57};
+sourceMarkerShape = ["o", "^", "o", "^", "square"];
+sourceMarkerColor = ['k', 'k', 'b', 'b', 'b'];
+
 
 %% DU vs. fO2
 
@@ -67,12 +89,21 @@ figure("Name", "log(DU) vs fO2")
 t = tiledlayout(1,1);
 ax1 = axes(t);
 
-plot(ax1, fO2_U, logDU, '.', 'MarkerSize', 15)
+
 hold on
-line(ax1, [fO2_U'; fO2_U'], [logDU' - 2*logDU_1sAbs_od'; logDU' + 2*logDU_1sAbs_od'], ...
-    'Color', rgb('Barney'), 'LineWidth', 2)
+for iSource = 1:length(sourceRows)
+    label = sourceLabels(iSource);
+    rows = sourceRows(iSource);
+    markershape = sourceMarkerShape(iSource);
+    markercolor = sourceMarkerColor(iSource);
+
+plot(ax1, fO2(rows), logDU, '.', 'MarkerSize', 15)
+% line(ax1, [fO2_U'; fO2_U'], [logDU' - 2*logDU_1sAbs_od'; logDU' + 2*logDU_1sAbs_od'], ...
+%     'Color', rgb('Barney'), 'LineWidth', 2)
 line(ax1, [fO2_U'; fO2_U'], [logDU' - 2*logDU_1sAbs'; logDU' + 2*logDU_1sAbs'], ...
     'Color', rgb('Vibrant Blue'), 'LineWidth', 1.5)
+end
+
 
 xbuf = 0.5; npts = 500;
 xlimits = [min(fO2_U) - xbuf max(fO2_U) + xbuf];
@@ -91,7 +122,6 @@ plot(ax1, xvector, yvector + 2*uncty, '-', "Color", rgb('Pine'), "LineWidth", 1.
 plot(ax1, xvector, yvector - 2*uncty, '-', "Color", rgb('Pine'), "LineWidth", 1.5)
 
 set(ax1, "FontSize", 18)
-xlabel(ax1, "log({\itf}O2)", "FontSize", 24)
 ylabel(ax1, "log(DU)", "FontSize", 24)
 
 currentXLim = xlim(gca);
@@ -100,14 +130,22 @@ newXLim(2) = min([fO2_upperBound, currentXLim(2), xlimits(2)]) + 0.2;
 xlim(ax1, newXLim)
 ax1.XTickMode = "auto";
 
-% % uncomment if plotting high-fO2 points
-% plot(fO2_highfO2, logDU_highfO2, '.b', 'MarkerSize', 15)
-% line([fO2_highfO2'; fO2_highfO2'], ...
-%     [logDU_highfO2' - 2*logDU_1sAbs_highfO2'; logDU_highfO2' + 2*logDU_1sAbs_highfO2'], ...
-%     'Color', rgb('black'), 'LineWidth', 2)
-% xlim([newXLim(1) 0])
+% uncomment if plotting high-fO2 points
+plot(fO2_highfO2, logDU_highfO2, '.b', 'MarkerSize', 15)
+line([fO2_highfO2'; fO2_highfO2'], ...
+    [logDU_highfO2' - 2*logDU_1sAbs_highfO2'; logDU_highfO2' + 2*logDU_1sAbs_highfO2'], ...
+    'Color', rgb('black'), 'LineWidth', 2)
 
-annotation("textbox", [0.4 0.14 0.5, 0.1], ...
+if output == "logfO2"
+    xlim([newXLim(1) 0]) % for plotting fO2
+    xlabel(ax1, "log({\itf}O2)", "FontSize", 24)
+elseif output == "deltaQFM"
+    xlim([newXLim(1) 7]) % for plotting fO2-deltaQFM
+    xlabel(ax1, "log({\itf}O2) \DeltaQFM", "FontSize", 24)
+else, disp("did not recognize output format")
+end
+
+annotation("textbox", [0.1 0.15 0.5, 0.1], ...
     "String", ...
     "Slope = " + round(x(1),2) + " ± " + round(2*stdx(1),2) + " (2\sigma)", ...
     "FontSize", 20, ...
@@ -115,22 +153,22 @@ annotation("textbox", [0.4 0.14 0.5, 0.1], ...
     "VerticalAlignment","middle", ...
     "LineStyle", "none")
 
-ax2 = axes(t);
-ax2.XAxisLocation = 'top';
-ax2.YAxisLocation = 'right';
-ax2.Color = 'none';
-set(ax2, "FontSize", 17)
+% ax2 = axes(t);
+% ax2.XAxisLocation = 'top';
+% ax2.YAxisLocation = 'right';
+% ax2.Color = 'none';
+% set(ax2, "FontSize", 17)
 
-ax1xlim = xlim(ax1);
-T = 1000 + 273.15; % assume a temperature in K for calcs
-FMQ = 9 - 25738/T; % per Mike
-ax2xlim = ax1xlim - FMQ;
-xlim(ax2, ax2xlim)
-xlabel(ax2, "log({\itf}O2), \DeltaQFM", "FontSize", 23)
-ylabel(ax2, "")
-ax2.XTickMode = "auto";
-ax2.YTickLabel = [];
-ax2.YTick = [];
+% ax1xlim = xlim(ax1);
+% T = 1000 + 273.15; % assume a temperature in K for calcs
+% FMQ = 9 - 25738/T; % per Mike
+% ax2xlim = ax1xlim - FMQ;
+% xlim(ax2, ax2xlim)
+% xlabel(ax2, "log({\itf}O2), \DeltaQFM", "FontSize", 23)
+% ylabel(ax2, "")
+% ax2.XTickMode = "auto";
+% ax2.YTickLabel = [];
+% ax2.YTick = [];
 
 %% Local functions
 
