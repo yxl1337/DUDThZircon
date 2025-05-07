@@ -10,6 +10,7 @@ opts.MissingRule = 'omitrow';
 
 data = readtable("CL Brightness DUvsDTh mol%.xlsx", opts);
 
+
 %% calculate DTh/DU
 
 data.DThDU = data.DTh ./ data.DU;
@@ -37,14 +38,34 @@ uncts = sqrt( dark(:,unctColumns).^2 + light(:,unctColumns).^2 );
 
 %% set up a plot
 
-figure
-errorbar(diffs.mean_DU, 2*uncts.ste_DU, '.', 'LineWidth', 5)
-yline(0)
+unctlinewidth = 10;
+ylinewidth = 2;
 
 figure
-errorbar(diffs.mean_DU, 2*uncts.ste_DTh, '.', 'LineWidth', 5)
-yline(0)
+errorbar(diffs.mean_DU, 2*uncts.ste_DU, '.', 'LineWidth', unctlinewidth, 'CapSize', 0)
+set(gca, "FontSize", 16)
+xlim([0, 12])
+xticks(1:11)
+xticklabels(dark.mixName)
+yline(0, 'LineWidth', ylinewidth)
+ylabel("DU_{dark} - DU_{light}", 'FontSize', 20)
 
 figure
-errorbar(diffs.mean_DU, 2*uncts.ste_DThDU, '.', 'LineWidth', 5)
-yline(0)
+errorbar(diffs.mean_DTh, 2*uncts.ste_DTh, '.', 'LineWidth', unctlinewidth, 'CapSize', 0)
+set(gca, "FontSize", 16)
+xlim([0, 12])
+xticks(1:11)
+xticklabels(dark.mixName)
+yline(0, 'LineWidth', ylinewidth)
+ylabel("DTh_{dark} - DTh_{light}", 'FontSize', 20)
+
+figure
+errorbar(diffs.mean_DThDU, 2*uncts.ste_DThDU, '.', 'LineWidth', unctlinewidth, 'CapSize', 0)
+set(gca, "FontSize", 16)
+xlim([0, 12])
+xticks(1:11)
+xticklabels(dark.mixName)
+yline(0, 'LineWidth', ylinewidth)
+ylabel("DTh/DU_{dark} - DTh/DU_{light}", 'FontSize', 20)
+set(gcf, 'InvertHardcopy', 'off');
+saveas(gcf, 'DThDU_sector_zoning.png')
