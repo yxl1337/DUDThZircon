@@ -42,7 +42,9 @@ unctlinewidth = 10;
 ylinewidth = 2;
 
 figure
-errorbar(diffs.mean_DU, 2*uncts.ste_DU, '.', 'LineWidth', unctlinewidth, 'CapSize', 0)
+errorbar(diffs.mean_DU, 2*uncts.ste_DU, '.', 'LineWidth', ...
+    unctlinewidth, 'CapSize', 0, 'MarkerSize', 35, ...
+    'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'k')
 set(gca, "FontSize", 16)
 xlim([0, 12])
 xticks(1:11)
@@ -51,7 +53,9 @@ yline(0, 'LineWidth', ylinewidth)
 ylabel("DU_{dark} - DU_{light}", 'FontSize', 20)
 
 figure
-errorbar(diffs.mean_DTh, 2*uncts.ste_DTh, '.', 'LineWidth', unctlinewidth, 'CapSize', 0)
+errorbar(diffs.mean_DTh, 2*uncts.ste_DTh, '.', 'LineWidth', ...
+    unctlinewidth, 'CapSize', 0, 'MarkerSize', 35, ...
+    'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'k')
 set(gca, "FontSize", 16)
 xlim([0, 12])
 xticks(1:11)
@@ -60,7 +64,9 @@ yline(0, 'LineWidth', ylinewidth)
 ylabel("DTh_{dark} - DTh_{light}", 'FontSize', 20)
 
 figure
-errorbar(diffs.mean_DThDU, 2*uncts.ste_DThDU, '.', 'LineWidth', unctlinewidth, 'CapSize', 0)
+errorbar(diffs.mean_DThDU, 2*uncts.ste_DThDU, '.', 'LineWidth', ...
+    unctlinewidth, 'CapSize', 0, 'MarkerSize', 35, ...
+    'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'k')
 set(gca, "FontSize", 16)
 xlim([0, 12])
 xticks(1:11)
