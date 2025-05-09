@@ -5,7 +5,7 @@ opts = spreadsheetImportOptions;
 opts.VariableNames = {'mixName', 'CLBrightness', 'DU', 'DTh'};
 opts.VariableTypes = {'string', 'categorical', 'double', 'double'};
 opts.Sheet = 'Tidy Data';
-opts.DataRange = 'E2:H269';
+opts.DataRange = 'E2:H288';
 opts.MissingRule = 'omitrow';
 
 data = readtable("CL Brightness DUvsDTh mol%.xlsx", opts);
@@ -46,8 +46,8 @@ errorbar(diffs.mean_DU, 2*uncts.ste_DU, '.', 'LineWidth', ...
     unctlinewidth, 'CapSize', 0, 'MarkerSize', 35, ...
     'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'k')
 set(gca, "FontSize", 16)
-xlim([0, 12])
-xticks(1:11)
+xlim([0, 13])
+xticks(1:12)
 xticklabels(dark.mixName)
 yline(0, 'LineWidth', ylinewidth)
 ylabel("DU_{dark} - DU_{light}", 'FontSize', 20)
@@ -57,19 +57,19 @@ errorbar(diffs.mean_DTh, 2*uncts.ste_DTh, '.', 'LineWidth', ...
     unctlinewidth, 'CapSize', 0, 'MarkerSize', 35, ...
     'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'k')
 set(gca, "FontSize", 16)
-xlim([0, 12])
-xticks(1:11)
+xlim([0, 13])
+xticks(1:12)
 xticklabels(dark.mixName)
 yline(0, 'LineWidth', ylinewidth)
 ylabel("DTh_{dark} - DTh_{light}", 'FontSize', 20)
 
 figure
-errorbar(diffs.mean_DThDU, 2*uncts.ste_DThDU, '.', 'LineWidth', ...
-    unctlinewidth, 'CapSize', 0, 'MarkerSize', 35, ...
+errorbar(diffs.mean_DThDU, 2*uncts.ste_DThDU, '_', 'LineWidth', ...
+    unctlinewidth, 'CapSize', 0, 'MarkerSize', 8, ...
     'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'k')
 set(gca, "FontSize", 16)
-xlim([0, 12])
-xticks(1:11)
+xlim([0, 13])
+xticks(1:12)
 xticklabels(dark.mixName)
 yline(0, 'LineWidth', ylinewidth)
 ylabel("DTh/DU_{dark} - DTh/DU_{light}", 'FontSize', 20)
