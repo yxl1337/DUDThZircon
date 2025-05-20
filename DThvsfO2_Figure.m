@@ -4,7 +4,7 @@ warning('OFF', 'MATLAB:table:ModifiedAndSavedVarnames');
 dataTable = readtable(filepath);
 
 % set up figure 
-figure("Name", "log(DU) vs fO2", 'Position', [1 1 1100 500])
+figure("Name", "log(DTh) vs fO2", 'Position', [1 1 1100 500])
 t = tiledlayout(1,2);
 nexttile; nexttile;
 
@@ -29,8 +29,8 @@ elseif output == "deltaQFM"
 else, disp("unknown output format")
 end
 
-DU_lowerBound = -Inf;
-DU_upperBound = Inf;
+DTh_lowerBound = -Inf;
+DTh_upperBound = Inf;
 
 % data sources and correpsonding rows in dataTable
 sourceLabels = [
@@ -47,41 +47,41 @@ sourceMarkerColor = ['k', 'k', "#A9A9A9", 'b', 'r'];
 %% Data handling
 
 % extract DU from data table
-DU_all = dataTable.DUMCWGlsStdErr;
-DU_1sAbs = dataTable.DUErrprWGlsStdErr;
+DTh_all = dataTable.DThMCWGlsStdErr;
+DTh_1sAbs = dataTable.DThErrorWGlsStdErr;
 
 % take logs
-logDU = log(DU_all);
-logDU_1sAbs = DU_1sAbs ./ DU_all; % approximation
+logDTh = log(DTh_all);
+logDTh_1sAbs = DTh_1sAbs ./ DTh_all; % approximation
 
 % find rows without missing data
-hasAllUData = all(~isnan([fO2, DU_all, DU_1sAbs]), 2);
+hasAllThData = all(~isnan([fO2, DTh_all, DTh_1sAbs]), 2);
 
 % locate data with reasonable fO2 for crust, zircon formation
 infO2Bounds = (fO2_lowerBound < fO2) & (fO2 < fO2_upperBound);
-inDUBounds = (DU_lowerBound < DU_all) & (DU_all < DU_upperBound);
+inDUBounds = (DTh_lowerBound < DTh_all) & (DTh_all < DTh_upperBound);
 
-inROI = hasAllUData & infO2Bounds & inDUBounds;
-nUdata_ROI = sum(inROI);
+inROI = hasAllThData & infO2Bounds & inDUBounds;
+nThdata_ROI = sum(inROI);
 
 % toss NaNs, enforce bounds, subset data for regression
-logDU_regression = logDU(inROI);
-logDU_1sAbs_regression = logDU_1sAbs(inROI);
+logDTh_regression = logDTh(inROI);
+logDTh_1sAbs_regression = logDTh_1sAbs(inROI);
 fO2_regression = fO2(inROI);
 
 % set up weighted least squares regression
 % y = ax + b
-designMatrix = [fO2_regression ones(nUdata_ROI,1)];
-weightVector = logDU_1sAbs_regression.^-2;
-dataCovMat = diag(logDU_1sAbs_regression.^2);
+designMatrix = [fO2_regression ones(nThdata_ROI,1)];
+weightVector = logDTh_1sAbs_regression.^-2;
+dataCovMat = diag(logDTh_1sAbs_regression.^2);
 
 % calculate excess variance needed to bring mse = 1
-odfun = @(od) lscov_od(designMatrix, logDU_regression, dataCovMat, od);
+odfun = @(od) lscov_od(designMatrix, logDTh_regression, dataCovMat, od);
 od = fsolve(odfun, 1); % overdispersion
-dataCov_od = dataCovMat + od*eye(nUdata_ROI); 
+dataCov_od = dataCovMat + od*eye(nThdata_ROI); 
 
 % perform linear regression with overdispersion term
-[x, stdx, mse, S] = lscov(designMatrix, logDU_regression, dataCov_od);
+[x, stdx, mse, S] = lscov(designMatrix, logDTh_regression, dataCov_od);
 logDU_1sAbs_od = sqrt(diag(dataCov_od));
 
 
@@ -99,10 +99,10 @@ for iSource = 1:length(sourceRows)
     markershape = sourceMarkerShape(iSource);
     markercolor = sourceMarkerColor(iSource);
     sourcefO2 = fO2(rows);
-    sourceLogDU = logDU(rows);
-    sourceLogDU_1sAbs = logDU_1sAbs(rows);
+    sourceLogDU = logDTh(rows);
+    sourceLogDU_1sAbs = logDTh_1sAbs(rows);
 
-    marks(iSource) = plot(ax, sourcefO2, logDU(rows), ...
+    marks(iSource) = plot(ax, sourcefO2, logDTh(rows), ...
     "Marker", markershape, ...
     "MarkerFaceColor", markercolor, ...
     "MarkerEdgeColor", 'k', ...
@@ -134,7 +134,7 @@ plot(ax, xvector, yvector - 2*uncty, '-', "Color", rgb('Pine'), "LineWidth", 1.5
 
 % Axes and scale formatting
 set(ax, "FontSize", 18)
-ylabel(ax, "log(D_U)", "FontSize", 24)
+ylabel(ax, "log(D_{Th})", "FontSize", 24)
 
 currentXLim = xlim(ax);
 newXLim(1) = max([fO2_lowerBound, currentXLim(1), xlimits(1)]);
@@ -167,7 +167,7 @@ lgd = legend(ax, marks, sourceLabels);
 lgd.Position = lgd.Position + [0.08 0.07 0 0];
 
 % set(gcf, 'InvertHardcopy', 'off'); % uncomment for gray background
-saveas(gcf, 'DvsfO2_side-by-side.png')
+saveas(gcf, 'DThvsfO2_side-by-side.png')
 
 %% Local functions
 
